@@ -4,10 +4,13 @@ from uuid import uuid4
 from django.utils.timezone import now
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, UUIDField, CharField, DateTimeField, \
-    ForeignKey, ManyToManyField
+    ForeignKey, ManyToManyField, FloatField, BooleanField, \
+    PositiveSmallIntegerField
 
 from phonenumber_field.modelfields import PhoneNumberField
 from django_google_maps.fields import AddressField, GeoLocationField
+
+from chaibase.core.enums import LeafGrade
 
 
 class User(AbstractUser):
@@ -67,6 +70,12 @@ class Factory(BaseModel):
         return f'{self.name}:{self.owner}'
 
 
+class Vehicle(BaseModel):
+    number = CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return f'{self.number}'
+
 
 class Person(BaseModel):
     '''
@@ -84,3 +93,27 @@ class Person(BaseModel):
 
     def __str__(self):
         return f'{self.first_name}:{self.last_name}:{self.nick_name}'
+
+
+class Weighment(BaseModel):
+    factory = ForeignKey(Factory, related_name="weighments")
+    person = ForeignKey(Person, related_name="weighments")
+    vehicle = ForeignKey(Vehicle, related_name="weighments")
+    date = DateTimeField(default=now)
+
+    def __str__(self):
+        return f'f({self.factory}):p({self.person}):v({self.vehicle})'\
+            ':d({self.date})'
+
+
+class Entry(BaseModel):
+    weight = FloatField(default=0.0)
+    is_confirmed = BooleanField(default=False)
+    weighment = ForeignKey(Weighment, related_name="entries")
+    grade = PositiveSmallIntegerField(
+        default=LeafGrade.UNKNOWN, choices=LeafGrade.CHOICES)
+
+    def __str__(self):
+        return f'w({self.weighment}):{self.weight}:{self.is_confirmed}'\
+            ':{self.get_grade_display()}'
+
