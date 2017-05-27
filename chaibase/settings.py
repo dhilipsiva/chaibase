@@ -41,8 +41,10 @@ INSTALLED_APPS = [
 
     'django_google_maps',
     'phonenumber_field',
+    'django_extensions',
 
     'chaibase.core',
+    'chaibase.importers',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +138,5 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'core.User'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyD8uCfIsh0qv8wcuj4jzvlflhWNrO3MzwU'
+
+DEMO_FACTORY = "demo"

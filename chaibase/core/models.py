@@ -4,7 +4,7 @@ from uuid import uuid4
 from django.utils.timezone import now
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, UUIDField, CharField, DateTimeField, \
-    ForeignKey, ManyToManyField, FloatField, BooleanField, \
+    ForeignKey, ManyToManyField, FloatField, BooleanField, DateField, \
     PositiveSmallIntegerField
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -27,6 +27,14 @@ class User(AbstractUser):
         abstract = False
         unique_together = ('email',)
 
+    def save(self, *args, **kwargs):
+        if 'pbkdf2_sha256' not in self.password:
+            self.set_password(self.password)
+        self.username = self.username.lower()
+        self.email = self.email.lower()
+        super(User, self).save(*args, **kwargs)
+        return self
+
 
 class BaseModel(Model):
     '''
@@ -48,7 +56,7 @@ class BaseModel(Model):
 
 class Location(BaseModel):
     '''
-    Factory Model
+    Location Model
     '''
     address = AddressField(max_length=200)
     geolocation = GeoLocationField(max_length=100)
@@ -63,7 +71,7 @@ class Factory(BaseModel):
     '''
     name = CharField(max_length=100)
     owner = ForeignKey(User, related_name='owned_factories')
-    location = ForeignKey(Location, related_name='factories')
+    location = ForeignKey(Location, related_name='factories', null=True)
     phone_number = PhoneNumberField(blank=True)
 
     def __str__(self):
@@ -82,28 +90,26 @@ class Person(BaseModel):
     Project Model
     '''
     factories = ManyToManyField(Factory, related_name='people')
-    first_name = CharField(max_length=30)
-    last_name = CharField(max_length=30, null=True, blank=True)
-    nick_name = CharField(max_length=30, null=True, blank=True)
-    initials = CharField(max_length=10, null=True, blank=True)
+    full_name = CharField(max_length=50, unique=True)
     home_number = PhoneNumberField(blank=True)
     mobile_number = PhoneNumberField(blank=True)
     office_number = PhoneNumberField(blank=True)
-    location = ForeignKey(Location, related_name='people')
+    location = ForeignKey(Location, related_name='people', null=True)
 
     def __str__(self):
-        return f'{self.first_name}:{self.last_name}:{self.nick_name}'
+        return self.full_name
 
 
 class Weighment(BaseModel):
-    factory = ForeignKey(Factory, related_name="weighments")
+    date = DateField(default=now)
     person = ForeignKey(Person, related_name="weighments")
     vehicle = ForeignKey(Vehicle, related_name="weighments")
-    date = DateTimeField(default=now)
+    factory = ForeignKey(Factory, related_name="weighments")
+    entry_count = PositiveSmallIntegerField(default=1)
 
     def __str__(self):
         return f'f({self.factory}):p({self.person}):v({self.vehicle})'\
-            ':d({self.date})'
+            f':d({self.date})'
 
 
 class Entry(BaseModel):
