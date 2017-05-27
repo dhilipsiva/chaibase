@@ -4,7 +4,7 @@ from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 
 from chaibase.core.models import User, Location, Factory, Person, Vehicle, \
-    Weighment, Entry
+    Weighment, Entry, Deduction
 
 
 class LocationAdmin(admin.ModelAdmin):
@@ -21,3 +21,4 @@ admin.site.register(Person)
 admin.site.register(Vehicle)
 admin.site.register(Weighment)
 admin.site.register(Entry)
+admin.site.register(Deduction)

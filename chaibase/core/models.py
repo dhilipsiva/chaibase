@@ -10,7 +10,7 @@ from django.db.models import Model, UUIDField, CharField, DateTimeField, \
 from phonenumber_field.modelfields import PhoneNumberField
 from django_google_maps.fields import AddressField, GeoLocationField
 
-from chaibase.core.enums import LeafGrade
+from chaibase.core.enums import EntryGrade, DeductionReason
 
 
 class User(AbstractUser):
@@ -111,9 +111,18 @@ class Entry(BaseModel):
     is_confirmed = BooleanField(default=False)
     weighment = ForeignKey(Weighment, related_name="entries")
     grade = PositiveSmallIntegerField(
-        default=LeafGrade.UNKNOWN, choices=LeafGrade.CHOICES)
+        default=EntryGrade.UNKNOWN, choices=EntryGrade.CHOICES)
 
     def __str__(self):
         return f'w({self.weighment}):{self.weight}:{self.is_confirmed}'\
             ':{self.get_grade_display()}'
 
+
+class Deduction(BaseModel):
+    weight = FloatField(default=0.0)
+    weighment = ForeignKey(Weighment, related_name="deductions")
+    reason = PositiveSmallIntegerField(
+        default=DeductionReason.UNKNOWN, choices=DeductionReason.CHOICES)
+
+    def __str__(self):
+        return f'w({self.weighment}):{self.weight}:{self.get_reason_display()}'

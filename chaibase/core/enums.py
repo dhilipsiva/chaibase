@@ -16,10 +16,21 @@ from orm_choices import choices_with_unknown as choices
 
 
 @choices
-class LeafGrade:
+class EntryGrade:
     class Meta:
         A = [1, "A"]
         A_PLUS = [2, "A+"]
         B = [3, "B"]
         B_PLUS = [4, "B+"]
         C = [5, "C"]
+
+
+@choices
+class DeductionReason:
+    class Meta:
+        WATER = [1, "Water"]
+        STICK = [2, "Stick"]
+        TARE = [3, "Tare"]
+        BURNT = [4, "Burnt"]
+        COARSE = [5, "Coarse"]
+        TEA = [6, "Tea"]
