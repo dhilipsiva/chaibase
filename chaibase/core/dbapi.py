@@ -12,7 +12,8 @@ Author: dhilipsiva <dhilipsiva@gmail.com>
 Date created: 2017-05-27
 """
 
-from chaibase.core.models import Person, Factory, Vehicle, Weighment, User
+from chaibase.core.models import Person, Factory, Vehicle, Weighment, User, \
+    Entry
 
 
 def get_person(**kwargs):
@@ -98,3 +99,20 @@ def create_user(**kwargs):
     docstring for create_user
     """
     return User.objects.create(**kwargs)
+
+
+def get_entry(**kwargs):
+    """
+    docstring for get_entry
+    """
+    try:
+        return Entry.objects.get(**kwargs)
+    except Entry.DoesNotExist:
+        return None
+
+
+def create_entry(**kwargs):
+    """
+    docstring for create_entry
+    """
+    return Entry.objects.create(**kwargs)

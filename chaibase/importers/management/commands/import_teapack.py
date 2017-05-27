@@ -3,9 +3,10 @@ import maya
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from chaibase.importers.teapack import Suppliermst, Vehiclemst, Leafsupplyhdr
+from chaibase.importers.teapack import Suppliermst, Vehiclemst, Leafsupplyhdr,\
+    Leafsupplyinbag
 from chaibase.core.dbapi import get_person, create_person, get_factory, \
-    get_vehicle, create_vehicle, get_weighment, create_weighment
+    get_vehicle, create_vehicle, get_weighment, create_weighment, create_entry
 
 factory = get_factory(name=settings.DEMO_FACTORY)
 print(factory)
@@ -41,3 +42,10 @@ class Command(BaseCommand):
             if weighment is None:
                 weighment = create_weighment(**kwargs)
             print(weighment)
+            for lsib in Leafsupplyinbag.select().where(
+                    Leafsupplyinbag.msupplyhdrcode
+                    == supply_header.msupplycode):
+                entry = create_entry(
+                    weighment=weighment, weight=lsib.mbagweight,
+                    is_confirmed=True)
+                print(entry)
