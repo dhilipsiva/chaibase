@@ -121,7 +121,7 @@ class Entry(BaseModel):
 
     def __str__(self):
         return f'w({self.weighment}):{self.weight}:{self.is_confirmed}'\
-            ':{self.get_grade_display()}'
+            f':{self.get_grade_display()}'
 
 
 class Deduction(BaseModel):
