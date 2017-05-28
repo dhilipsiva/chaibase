@@ -34,3 +34,4 @@ class DeductionReason:
         BURNT = [4, "Burnt"]
         COARSE = [5, "Coarse"]
         TEA = [6, "Tea"]
+        OTHERS = [7, "Others"]

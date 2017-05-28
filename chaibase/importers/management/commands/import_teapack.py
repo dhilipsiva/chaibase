@@ -3,13 +3,27 @@ import maya
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from chaibase.importers.teapack import Suppliermst, Vehiclemst, Leafsupplyhdr,\
-    Leafsupplyinbag
+from chaibase.core.enums import DeductionReason
 from chaibase.core.dbapi import get_person, create_person, get_factory, \
-    get_vehicle, create_vehicle, get_weighment, create_weighment, create_entry
+    get_vehicle, create_vehicle, get_weighment, create_weighment, \
+    create_entry, create_deduction
+
+from chaibase.importers.teapack import Suppliermst, Vehiclemst, \
+    Leafsupplyhdr, Leafsupplyinbag, Deductiondetails
 
 factory = get_factory(name=settings.DEMO_FACTORY)
 print(factory)
+
+
+_DR = {
+    "Tare": DeductionReason.TARE,
+    "CL": DeductionReason.COARSE,
+    "Stick": DeductionReason.STICK,
+    "Water": DeductionReason.WATER,
+    "Burnt Leaf": DeductionReason.BURNT,
+    "Tea": DeductionReason.TEA,
+    "Others": DeductionReason.OTHERS,
+}
 
 
 class Command(BaseCommand):
@@ -49,3 +63,9 @@ class Command(BaseCommand):
                     weighment=weighment, weight=lsib.mbagweight,
                     is_confirmed=True)
                 print(entry)
+            for _deduction in Deductiondetails.select().where(
+                    Deductiondetails.msupplycode == supply_header.msupplycode):
+                deduction = create_deduction(
+                    weight=int(_deduction.mdeductweight), weighment=weighment,
+                    reason=_DR[_deduction.mdeductiontype])
+                print(deduction)

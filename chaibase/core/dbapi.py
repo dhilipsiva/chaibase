@@ -13,7 +13,7 @@ Date created: 2017-05-27
 """
 
 from chaibase.core.models import Person, Factory, Vehicle, Weighment, User, \
-    Entry
+    Entry, Deduction
 
 
 def get_person(**kwargs):
@@ -116,3 +116,10 @@ def create_entry(**kwargs):
     docstring for create_entry
     """
     return Entry.objects.create(**kwargs)
+
+
+def create_deduction(**kwargs):
+    """
+    docstring for create_entry
+    """
+    return Deduction.objects.create(**kwargs)
