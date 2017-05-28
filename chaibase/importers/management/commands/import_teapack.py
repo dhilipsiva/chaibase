@@ -3,7 +3,7 @@ import maya
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from chaibase.core.enums import DeductionReason
+from chaibase.core.enums import DeductionReason, EntryGrade
 from chaibase.core.dbapi import get_person, create_person, get_factory, \
     get_vehicle, create_vehicle, get_weighment, create_weighment, \
     create_entry, create_deduction
@@ -23,6 +23,14 @@ _DR = {
     "Burnt Leaf": DeductionReason.BURNT,
     "Tea": DeductionReason.TEA,
     "Others": DeductionReason.OTHERS,
+}
+
+_EG = {
+    "A": EntryGrade.A,
+    "A+": EntryGrade.A_PLUS,
+    "B": EntryGrade.B,
+    "B+": EntryGrade.B_PLUS,
+    "C": EntryGrade.C,
 }
 
 
@@ -59,9 +67,12 @@ class Command(BaseCommand):
             for lsib in Leafsupplyinbag.select().where(
                     Leafsupplyinbag.msupplyhdrcode
                     == supply_header.msupplycode):
+                print(supply_header.mweighedbyname)
                 entry = create_entry(
                     weighment=weighment, weight=lsib.mbagweight,
-                    is_confirmed=True)
+                    is_confirmed=True,
+                    grade=_EG.get(
+                        supply_header.mweighedbyname, EntryGrade.UNKNOWN))
                 print(entry)
             for _deduction in Deductiondetails.select().where(
                     Deductiondetails.msupplycode == supply_header.msupplycode):
