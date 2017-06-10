@@ -26,7 +26,10 @@ SECRET_KEY = 'pjvn8e5l%t(7948)^w9-wbhq=r%=ir2)#2u)tegq5q4dr-yniv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '0.0.0.0',
+]
 
 
 # Application definition
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'tokenapi',
     'django_google_maps',
     'phonenumber_field',
     'django_extensions',
@@ -140,3 +144,9 @@ AUTH_USER_MODEL = 'core.User'
 GOOGLE_MAPS_API_KEY = 'AIzaSyD8uCfIsh0qv8wcuj4jzvlflhWNrO3MzwU'
 
 DEMO_FACTORY = "demo"
+
+AUTHENTICATION_BACKENDS = [
+    'tokenapi.backends.TokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+
+]
