@@ -1,5 +1,4 @@
 # Django
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth import logout as dj_logout, authenticate
 
@@ -10,19 +9,22 @@ from tokenapi.tokens import token_generator
 from chaibase.core.dbapi import get_user
 
 
-@csrf_exempt
 def login(request):
-    username = request.POST.get('username', "").strip()
+    identification = request.POST.get('identification', "").strip()
     password = request.POST.get('password', "").strip()
 
-    if username == "" or password == "":
+    if identification == "" or password == "":
         return JsonResponse({
-            "message": "both 'username' and 'password' needed"}, status=403)
+            "message": "both 'identification' and 'password' needed"},
+            status=403)
 
-    user = authenticate(username=username, password=password)
+    user = authenticate(username=identification, password=password)
+    if not user:
+        user = authenticate(email=identification, password=password)
+
     if not user:
         return JsonResponse({
-            "message": "Unable to log you in, please try again."}, status=403)
+            "message": "Invalid Credentials"}, status=403)
 
     if not user.is_active:
         return JsonResponse({
@@ -34,7 +36,6 @@ def login(request):
     return JsonResponse(data)
 
 
-@csrf_exempt
 def check(request):
     token = request.POST.get('token', "").strip()
     user_uuid = request.POST.get('user_id', '').strip()
@@ -51,7 +52,6 @@ def check(request):
         "message": "Unable to log you in, please try again."}, status=403)
 
 
-@csrf_exempt
 def logout(request):
     dj_logout(request)
     return JsonResponse(
