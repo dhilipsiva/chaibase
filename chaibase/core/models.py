@@ -3,9 +3,10 @@ from uuid import uuid4
 
 from django.utils.timezone import now
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import JSONField
 from django.db.models import Model, UUIDField, CharField, DateTimeField, \
     ForeignKey, ManyToManyField, FloatField, BooleanField, DateField, \
-    PositiveSmallIntegerField
+    PositiveSmallIntegerField, Manager
 
 from phonenumber_field.modelfields import PhoneNumberField
 from django_google_maps.fields import AddressField, GeoLocationField
@@ -36,21 +37,36 @@ class User(AbstractUser):
         return self
 
 
+class BaseManager(Manager):
+    '''
+    Use this manager to get objects that have a deleted field
+    '''
+    def get_query_set(self):
+        return super(BaseManager, self).get_query_set().filter(is_deleted=False)
+
+    def all_with_deleted(self):
+        return super(BaseManager, self).get_query_set()
+
+    def deleted_set(self):
+        return super(BaseManager, self).get_query_set().filter(is_deleted=True)
+
+
 class BaseModel(Model):
     '''
     This shoud be inherited by all the classes whose objects are created due
     to user interaction.
     '''
     uuid = UUIDField(default=uuid4, primary_key=True, editable=False)
+    is_deleted = BooleanField(default=False)
+    objects = BaseManager()
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return str(self.uuid)
+        return str(self.uuid, self.is_deleted)
 
     def __repr__(self):
-
         return f'<{self.__class__.__name__}: {self.__str__()}>'
 
 

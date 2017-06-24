@@ -41,7 +41,7 @@ def check(request):
     user_uuid = request.POST.get('user_id', '').strip()
     user = get_user(pk=user_uuid)
 
-    if not user:
+    if user is None:
         JsonResponse(
             {"message": "Please send a valid user_id"}, status=403)
 
