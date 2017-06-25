@@ -13,10 +13,11 @@ Date created: 2017-06-07
 """
 
 from django.conf.urls import url
-from chaibase.core.views import login, check, logout
+from chaibase.core.views import login, check, logout, browser
 
 urlpatterns = [
     url(r'^login$', login, name="login"),
     url(r'^check$', check, name="check"),
     url(r'^logout$', logout, name="logout"),
+    url(r'^browser/([a-z0-9]{32})$', browser, name="browser"),
 ]

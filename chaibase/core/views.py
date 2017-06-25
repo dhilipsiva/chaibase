@@ -1,3 +1,5 @@
+# Standard imports
+
 # Django
 from django.http import JsonResponse
 from django.contrib.auth import logout as dj_logout, authenticate
@@ -6,7 +8,8 @@ from django.contrib.auth import logout as dj_logout, authenticate
 from tokenapi.tokens import token_generator
 
 # ChaiBase
-from chaibase.core.dbapi import get_user
+from chaibase.core.dbapi import get_user, get_browser, create_browser, \
+    update_browser
 
 
 def login(request):
@@ -56,3 +59,16 @@ def logout(request):
     dj_logout(request)
     return JsonResponse(
             {'message': 'Logout out succcessfully!'}, status=200)
+
+
+def browser(request, fingerprint):
+    """
+    Fingerprinting browsers
+    """
+    print(fingerprint)
+    _browser = get_browser(fingerprint)
+    if _browser is None:
+        _browser = create_browser(fingerprint, request.POST)
+    else:
+        _browser = update_browser(_browser, request.POST)
+    return JsonResponse(_browser.to_dict())

@@ -13,7 +13,7 @@ Date created: 2017-05-27
 """
 
 from chaibase.core.models import Person, Factory, Vehicle, Weighment, User, \
-    Entry, Deduction
+    Entry, Deduction, Browser
 
 
 def get_person(**kwargs):
@@ -123,3 +123,26 @@ def create_deduction(**kwargs):
     docstring for create_entry
     """
     return Deduction.objects.create(**kwargs)
+
+
+def get_browser(fingerprint):
+    """
+    Get a browser
+    """
+    try:
+        return Browser.objects.get(fingerprint=fingerprint)
+    except Browser.DoesNotExist:
+        return None
+
+
+def create_browser(fingerprint, data):
+    """
+    Create a browser
+    """
+    return Browser.objects.create(fingerprint=fingerprint, data=data)
+
+
+def update_browser(browser, data):
+    browser.data = data
+    browser.save()
+    return browser
