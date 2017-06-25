@@ -6,7 +6,8 @@
 # Distributed under terms of the MIT license.
 #
 
+set -x
 
-echo "chaibase"
-createuser -P chaibase
-createdb -O chaibase
+createuser -P chaibase -d
+createdb -O chaibase chaibase
+./scripts/recreate.sh

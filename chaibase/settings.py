@@ -19,9 +19,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 def _env(var, default=None):
     '''
-    docstring for mycroft_env
+    docstring for chaibase_env
     '''
-    return os.environ.get('MYCROFT_%s' % var, default)
+    return os.environ.get('CHAIBASE_%s' % var, default)
 
 
 # Quick-start development settings - unsuitable for production
@@ -103,9 +103,9 @@ DATABASES = {
     'default': {
         'ENGINE': _env(
             'DATABASE_ENGINE', 'django.db.backends.postgresql_psycopg2'),
-        'NAME': _env('DATABASE_NAME', 'mycroft'),
-        'USER': _env('DATABASE_USER', 'mycroft'),
-        'PASSWORD': _env('DATABASE_PASSWORD', 'mycroft'),
+        'NAME': _env('DATABASE_NAME', 'chaibase'),
+        'USER': _env('DATABASE_USER', 'chaibase'),
+        'PASSWORD': _env('DATABASE_PASSWORD', 'chaibase'),
         'HOST': _env('DATABASE_HOST', '127.0.0.1'),
         'PORT': _env('DATABASE_PORT', 5432),
     }
