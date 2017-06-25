@@ -14,15 +14,63 @@ from django_google_maps.fields import AddressField, GeoLocationField
 from chaibase.core.enums import EntryGrade, DeductionReason
 
 
-class User(AbstractUser):
+class BaseManager(Manager):
+    """
+    Respect `is_deleted`
+    """
+
+    def everything(self):
+        return super(BaseManager, self).get_queryset()
+
+    def get_queryset(self):
+        return self.everything().filter(is_deleted=False)
+
+    def deleted_set(self):
+        return self.everything().filter(is_deleted=True)
+
+
+class BaseModel(Model):
+    '''
+    This shoud be inherited by all the classes whose objects are created due
+    to user interaction.
+    '''
+    objects = BaseManager
+    is_deleted = BooleanField(default=False)
+    uuid = UUIDField(default=uuid4, primary_key=True, editable=False)
+
+    class Meta:
+        abstract = True
+
+    def delete(self):
+        """
+        Override delete
+        """
+        self.is_deleted = True
+        self.save()
+        return self
+
+    def undelete(self):
+        """
+        Override delete
+        """
+        self.is_deleted = False
+        self.save()
+        return self
+
+    def __str__(self):
+        return f"{self.uuid}, {self.is_deleted}"
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: {self.__str__()}>'
+
+
+class User(BaseModel, AbstractUser):
     '''
     A custom user so that we can add permissions easily
     '''
-    uuid = UUIDField(default=uuid4, primary_key=True, editable=False)
-    socket_id = UUIDField(
+    socket_uuid = UUIDField(
         default=uuid4, editable=False, db_index=True, unique=True)
     phone_number = PhoneNumberField(blank=True)
-    expiry = DateTimeField(default=now)
 
     class Meta(AbstractUser.Meta):
         abstract = False
@@ -36,38 +84,6 @@ class User(AbstractUser):
         super(User, self).save(*args, **kwargs)
         return self
 
-
-class BaseManager(Manager):
-    '''
-    Use this manager to get objects that have a deleted field
-    '''
-    def get_query_set(self):
-        return super(BaseManager, self).get_query_set().filter(is_deleted=False)
-
-    def all_with_deleted(self):
-        return super(BaseManager, self).get_query_set()
-
-    def deleted_set(self):
-        return super(BaseManager, self).get_query_set().filter(is_deleted=True)
-
-
-class BaseModel(Model):
-    '''
-    This shoud be inherited by all the classes whose objects are created due
-    to user interaction.
-    '''
-    uuid = UUIDField(default=uuid4, primary_key=True, editable=False)
-    is_deleted = BooleanField(default=False)
-    objects = BaseManager()
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return str(self.uuid, self.is_deleted)
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: {self.__str__()}>'
 
 
 class Location(BaseModel):

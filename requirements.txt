@@ -1,6 +1,7 @@
 Babel==2.4.0
 dateparser==0.6.0
-Django==1.11.1
+deepdiff==3.2.1
+Django==1.11.2
 django-cors-headers==2.1.0
 django-extensions==1.7.9
 django-google-maps==0.7.0

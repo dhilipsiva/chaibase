@@ -8,6 +8,7 @@
 
 
 rm db.sqlite3
+find . -regex ".*/migrations/00.*.py" | xargs rm
 ./manage.py makemigrations
 ./manage.py migrate
 ./manage.py seed_db

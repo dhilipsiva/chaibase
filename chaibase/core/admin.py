@@ -7,18 +7,23 @@ from chaibase.core.models import User, Location, Factory, Person, Vehicle, \
     Weighment, Entry, Deduction
 
 
-class LocationAdmin(admin.ModelAdmin):
+class BaseAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'is_deleted',)
+    list_filter = ('is_deleted',)
+
+
+class LocationAdmin(BaseAdmin):
     formfield_overrides = {
         map_fields.AddressField: {
             'widget': map_widgets.GoogleMapsAddressWidget},
     }
 
 
-admin.site.register(User)
+admin.site.register(User, BaseAdmin)
 admin.site.register(Location, LocationAdmin)
-admin.site.register(Factory)
-admin.site.register(Person)
-admin.site.register(Vehicle)
-admin.site.register(Weighment)
-admin.site.register(Entry)
-admin.site.register(Deduction)
+admin.site.register(Factory, BaseAdmin)
+admin.site.register(Person, BaseAdmin)
+admin.site.register(Vehicle, BaseAdmin)
+admin.site.register(Weighment, BaseAdmin)
+admin.site.register(Entry, BaseAdmin)
+admin.site.register(Deduction, BaseAdmin)
