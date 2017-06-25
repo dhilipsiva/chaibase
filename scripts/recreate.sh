@@ -10,7 +10,6 @@ set -x
 
 # rm db.sqlite3
 ./manage.py reset_db -c --noinput
-createdb -O chaibase chaibase
 find . -regex ".*/migrations/00.*.py" -exec rm {} +
 ./manage.py makemigrations
 ./manage.py migrate
