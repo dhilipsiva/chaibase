@@ -2,6 +2,7 @@ from uuid import uuid4
 
 
 from django.utils.timezone import now
+from django.contrib.auth.models import UserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
 from django.db.models import Model, UUIDField, CharField, DateTimeField, \
@@ -28,13 +29,16 @@ class BaseManager(Manager):
     def deleted_set(self):
         return self.everything().filter(is_deleted=True)
 
+class BaseUserManager(BaseManager, UserManager):
+    pass
+
 
 class BaseModel(Model):
     '''
     This shoud be inherited by all the classes whose objects are created due
     to user interaction.
     '''
-    objects = BaseManager
+    objects = BaseManager()
     is_deleted = BooleanField(default=False)
     uuid = UUIDField(default=uuid4, primary_key=True, editable=False)
 
@@ -68,6 +72,7 @@ class User(BaseModel, AbstractUser):
     '''
     A custom user so that we can add permissions easily
     '''
+    objects = BaseUserManager()
     socket_uuid = UUIDField(
         default=uuid4, editable=False, db_index=True, unique=True)
     phone_number = PhoneNumberField(blank=True)

@@ -17,6 +17,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
+def _env(var, default=None):
+    '''
+    docstring for mycroft_env
+    '''
+    return os.environ.get('MYCROFT_%s' % var, default)
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -92,13 +99,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'chaibase.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': _env(
+            'DATABASE_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+        'NAME': _env('DATABASE_NAME', 'mycroft'),
+        'USER': _env('DATABASE_USER', 'mycroft'),
+        'PASSWORD': _env('DATABASE_PASSWORD', 'mycroft'),
+        'HOST': _env('DATABASE_HOST', '127.0.0.1'),
+        'PORT': _env('DATABASE_PORT', 5432),
     }
 }
 
