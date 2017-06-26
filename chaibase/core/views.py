@@ -57,7 +57,6 @@ def browser(request, fingerprint):
     """
     Fingerprinting browsers
     """
-    print(fingerprint)
     _browser = get_browser(fingerprint)
     if _browser is None:
         _browser = create_browser(fingerprint, request.POST)
