@@ -93,6 +93,7 @@ def get_user(user_uuid):
     except User.DoesNotExist:
         return None
 
+
 def get_user_by_username(username):
     """
     docstring for get_factory
@@ -134,21 +135,21 @@ def create_deduction(**kwargs):
     return Deduction.objects.create(**kwargs)
 
 
-def get_browser(fingerprint):
+def get_browser(browser_uuid):
     """
     Get a browser
     """
     try:
-        return Browser.objects.get(fingerprint=fingerprint)
+        return Browser.objects.get(uuid=browser_uuid)
     except Browser.DoesNotExist:
         return None
 
 
-def create_browser(fingerprint, data):
+def create_browser(browser_uuid, data):
     """
     Create a browser
     """
-    return Browser.objects.create(fingerprint=fingerprint, data=data)
+    return Browser.objects.create(uuid=browser_uuid, data=data)
 
 
 def update_browser(browser, data):

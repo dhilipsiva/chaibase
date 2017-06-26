@@ -17,26 +17,6 @@ from django_google_maps.fields import AddressField, GeoLocationField
 from chaibase.core.enums import EntryGrade, DeductionReason
 
 
-class Browser(Model):
-    """
-    Utility model to ID the browser
-    """
-    fingerprint = CharField(max_length=32, primary_key=True)
-    data = JSONField(default=dict)
-
-    def to_dict(self):
-        return {
-            "fingerprint": self.fingerprint,
-            "data": self.data,
-        }
-
-    def __str__(self):
-        return self.fingerprint
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}:{self}>'
-
-
 class BaseManager(Manager):
     """
     Respect `is_deleted`
@@ -95,6 +75,19 @@ class BaseModel(Model):
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: {self.__str__()}>'
+
+
+class Browser(BaseModel):
+    """
+    Utility model to ID the browser
+    """
+    data = JSONField(default=dict)
+
+    def to_dict(self):
+        return {
+            "id": str(self.uuid),
+            "data": self.data,
+        }
 
 
 class User(BaseModel, AbstractUser):

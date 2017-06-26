@@ -19,6 +19,6 @@ urlpatterns = [
     url(r'^login$', login, name="login"),
     url(r'^check$', check, name="check"),
     url(r'^logout$', logout, name="logout"),
-    url(r'^browser/([a-z0-9]{32})$', browser, name="browser"),
+    url(r'^browsers/([a-z0-9]{32})$', browser, name="browser"),
     url(r'^users/([\-a-z0-9]{36})$', user, name="user"),
 ]
