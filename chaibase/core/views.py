@@ -5,11 +5,11 @@ from django.http import JsonResponse
 from django.contrib.auth import logout as dj_logout, authenticate
 
 # Django 3rd party
-from tokenapi.tokens import token_generator
+from tokenapi.decorators import token_required
 
 # ChaiBase
-from chaibase.core.dbapi import get_user, get_browser, create_browser, \
-    update_browser
+from chaibase.core.dbapi import get_browser, create_browser, update_browser, \
+    get_user
 
 
 def login(request):
@@ -32,27 +32,19 @@ def login(request):
     if not user.is_active:
         return JsonResponse({
             "message": "User account is disabled."}, status=403)
-    data = {
-        'token': token_generator.make_token(user),
-        'user_id': str(user.pk),
-    }
-    return JsonResponse(data)
+
+    return JsonResponse({"user_id": user.uuid, "token": user.b64token})
 
 
 def check(request):
     token = request.POST.get('token', "").strip()
     user_uuid = request.POST.get('user_id', '').strip()
-    user = get_user(pk=user_uuid)
-
-    if user is None:
-        JsonResponse(
-            {"message": "Please send a valid user_id"}, status=403)
-
-    if token_generator.check_token(user, token) and user.is_active:
-        return JsonResponse(request.POST)
-
+    user = get_user(user_uuid)
+    if user is None or user.check_token(token):
+        return JsonResponse({
+            "message": "Invalid User / Token"}, status=403)
     return JsonResponse({
-        "message": "Unable to log you in, please try again."}, status=403)
+        'data': user.to_dict(with_sensitive_data=True)})
 
 
 def logout(request):
@@ -72,3 +64,9 @@ def browser(request, fingerprint):
     else:
         _browser = update_browser(_browser, request.POST)
     return JsonResponse(_browser.to_dict())
+
+
+@token_required
+def user(request, user_uuid):
+    _user = get_user(user_uuid)
+    return JsonResponse({'data': _user.to_dict(with_sensitive_data=True)})

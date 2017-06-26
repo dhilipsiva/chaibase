@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from chaibase.core.dbapi import create_user, create_factory, get_user, \
-    get_factory
+from chaibase.core.dbapi import create_user, create_factory, get_factory, \
+    get_user_by_username
 
 
 class Command(BaseCommand):
@@ -12,7 +12,7 @@ class Command(BaseCommand):
     #     parser.add_argument('sample', nargs='+')
 
     def handle(self, *args, **options):
-        user = get_user(username="dhilipsiva")
+        user = get_user_by_username("dhilipsiva")
         if user is None:
             user = create_user(
                 username="dhilipsiva", password="test1234", is_staff=True,

@@ -84,12 +84,21 @@ def create_weighment(**kwargs):
     return Weighment.objects.create(**kwargs)
 
 
-def get_user(**kwargs):
+def get_user(user_uuid):
     """
     docstring for get_factory
     """
     try:
-        return User.objects.get(**kwargs)
+        return User.objects.get(uuid=user_uuid)
+    except User.DoesNotExist:
+        return None
+
+def get_user_by_username(username):
+    """
+    docstring for get_factory
+    """
+    try:
+        return User.objects.get(username=username)
     except User.DoesNotExist:
         return None
 

@@ -81,6 +81,7 @@ MIDDLEWARE = [
 
 CORS_ALLOW_HEADERS = default_headers + (
     'X-Fingerprint',
+    'Authorization',
 )
 
 ROOT_URLCONF = 'chaibase.urls'

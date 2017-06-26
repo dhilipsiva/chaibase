@@ -1,15 +1,17 @@
 from uuid import uuid4
+from base64 import b64encode
 
 
 from django.utils.timezone import now
 from django.contrib.auth.models import UserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Model, UUIDField, CharField, DateTimeField, \
+from django.db.models import Model, UUIDField, CharField, \
     ForeignKey, ManyToManyField, FloatField, BooleanField, DateField, \
     PositiveSmallIntegerField, Manager
 
 from phonenumber_field.modelfields import PhoneNumberField
+from tokenapi.tokens import token_generator
 from django_google_maps.fields import AddressField, GeoLocationField
 
 from chaibase.core.enums import EntryGrade, DeductionReason
@@ -29,12 +31,10 @@ class Browser(Model):
         }
 
     def __str__(self):
-        return f"{self.fingerprint}"
+        return self.fingerprint
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}: {self.__str__()}>'
-
-
+        return f'<{self.__class__.__name__}:{self}>'
 
 
 class BaseManager(Manager):
@@ -51,6 +51,7 @@ class BaseManager(Manager):
     def deleted_set(self):
         return self.everything().filter(is_deleted=True)
 
+
 class BaseUserManager(BaseManager, UserManager):
     pass
 
@@ -66,6 +67,12 @@ class BaseModel(Model):
 
     class Meta:
         abstract = True
+
+    def to_dict(self):
+        """
+        Serialize
+        """
+        return dict(id=str(self.uuid))
 
     def delete(self):
         """
@@ -111,6 +118,40 @@ class User(BaseModel, AbstractUser):
         super(User, self).save(*args, **kwargs)
         return self
 
+    @property
+    def token(self):
+        """
+        Get he token
+        """
+        return token_generator.make_token(self)
+
+    @property
+    def b64token(self):
+        _bytes = f"{self.uuid}:{self.token}".encode()
+        return b64encode(_bytes).decode()
+
+    def check_token(self, token):
+        """
+        Check the given token
+        """
+        return token_generator.check_token(self, token)
+
+    def to_dict(self, with_sensitive_data=False):
+        """
+        Serialize
+        """
+        d = dict(username=self.username)
+        if with_sensitive_data is True:
+            d.update({
+                'socket-uuid': self.socket_uuid,
+                'phone-number': self.phone_number,
+                'b6token': self.b64token
+            })
+        return {
+            "id": self.pk,
+            "type": "users",
+            "attributes": d,
+        }
 
 
 class Location(BaseModel):
