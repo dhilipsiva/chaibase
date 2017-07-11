@@ -35,3 +35,13 @@ class DeductionReason:
         COARSE = [5, "Coarse"]
         TEA = [6, "Tea"]
         OTHERS = [7, "Others"]
+
+
+@choices
+class StaffRole:
+    class Meta:
+        ADMIN = [1, "Admin"]
+        MANAGER = [2, "Manager"]
+        SUPERVISOR = [3, "Supervisor"]
+        WRITER = [4, "Writer"]
+        INSPECTOR = [5, "Inspector"]

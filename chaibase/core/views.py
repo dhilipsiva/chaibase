@@ -9,7 +9,7 @@ from tokenapi.decorators import token_required
 
 # ChaiBase
 from chaibase.core.dbapi import get_browser, create_browser, update_browser, \
-    get_user
+    get_user, get_factory
 
 
 def login(request):
@@ -22,14 +22,14 @@ def login(request):
             status=403)
 
     user = authenticate(username=identification, password=password)
-    if not user:
+    if user is None:
         user = authenticate(email=identification, password=password)
 
-    if not user:
+    if user is None:
         return JsonResponse({
             "message": "Invalid Credentials"}, status=403)
 
-    if not user.is_active:
+    if user.is_active is False:
         return JsonResponse({
             "message": "User account is disabled."}, status=403)
 
@@ -43,8 +43,7 @@ def check(request):
     if user is None or user.check_token(token):
         return JsonResponse({
             "message": "Invalid User / Token"}, status=403)
-    return JsonResponse({
-        'data': user.to_dict(with_sensitive_data=True)})
+    return JsonResponse({"user_id": user.uuid, "token": user.b64token})
 
 
 def logout(request):
@@ -69,3 +68,18 @@ def browser(request, fingerprint):
 def user(request, user_uuid):
     _user = get_user(user_uuid)
     return JsonResponse({'data': _user.to_dict(with_sensitive_data=True)})
+
+
+@token_required
+def factories(request, factory_uuid=None):
+    """
+    Get all factories
+    """
+    if factory_uuid is not None:
+        factory = get_factory(uuid=factory_uuid)
+        return JsonResponse({'data': factory.to_dict()})
+        _factories = []
+
+    for factory in request.user.all_factories():
+        _factories.append(factory.to_dict())
+    return JsonResponse({'data': _factories})

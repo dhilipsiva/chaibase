@@ -13,7 +13,7 @@ Date created: 2017-06-07
 """
 
 from django.conf.urls import url
-from chaibase.core.views import login, check, logout, browser, user
+from chaibase.core.views import login, check, logout, browser, user, factories
 
 urlpatterns = [
     url(r'^login$', login, name="login"),
@@ -21,4 +21,6 @@ urlpatterns = [
     url(r'^logout$', logout, name="logout"),
     url(r'^browsers/([a-z0-9]{32})$', browser, name="browser"),
     url(r'^users/([\-a-z0-9]{36})$', user, name="user"),
+    url(r'^factories$', factories, name="factories"),
+    url(r'^factories/([\-a-z0-9]{36})$', factories, name="factories"),
 ]

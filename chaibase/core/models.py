@@ -14,7 +14,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from tokenapi.tokens import token_generator
 from django_google_maps.fields import AddressField, GeoLocationField
 
-from chaibase.core.enums import EntryGrade, DeductionReason
+from chaibase.core.enums import EntryGrade, DeductionReason, StaffRole
 
 
 class BaseManager(Manager):
@@ -111,6 +111,10 @@ class User(BaseModel, AbstractUser):
         super(User, self).save(*args, **kwargs)
         return self
 
+    def all_factories(self):
+        return list(self.owned_factories.all()) + [
+            staff.factory for staff in self.staffs.all()]
+
     @property
     def token(self):
         """
@@ -129,6 +133,10 @@ class User(BaseModel, AbstractUser):
         """
         return token_generator.check_token(self, token)
 
+    @property
+    def factory_count(self):
+        return self.owned_factories.count() + self.staffs.count()
+
     def to_dict(self, with_sensitive_data=False):
         """
         Serialize
@@ -138,7 +146,8 @@ class User(BaseModel, AbstractUser):
             d.update({
                 'socket-uuid': self.socket_uuid,
                 'phone-number': self.phone_number,
-                'b6token': self.b64token
+                'b6token': self.b64token,
+                'factory-count': self.factory_count,
             })
         return {
             "id": self.pk,
@@ -167,8 +176,29 @@ class Factory(BaseModel):
     location = ForeignKey(Location, related_name='factories', null=True)
     phone_number = PhoneNumberField(blank=True)
 
+    def to_dict(self):
+        """
+        Serialize
+        """
+        d = {'name': self.name, 'phone-number': self.phone_number}
+        return {
+            "id": self.pk,
+            "type": "factories",
+            "attributes": d,
+        }
+
     def __str__(self):
         return f'{self.name}:{self.owner}'
+
+
+class Staff(BaseModel):
+    user = ForeignKey(User, related_name='staffs')
+    factory = ForeignKey(Factory, related_name='staffs')
+    role = PositiveSmallIntegerField(
+        default=StaffRole.UNKNOWN, choices=StaffRole.CHOICES)
+
+    def __str__(self):
+        return f"{self.user}:{self.factory}:{self.get_role_display}"
 
 
 class Vehicle(BaseModel):
