@@ -33,17 +33,17 @@ def login(request):
         return JsonResponse({
             "message": "User account is disabled."}, status=403)
 
-    return JsonResponse({"user_id": user.uuid, "token": user.b64token})
+    return JsonResponse({"user_id": user.id, "token": user.b64token})
 
 
 def check(request):
     token = request.POST.get('token', "").strip()
-    user_uuid = request.POST.get('user_id', '').strip()
-    user = get_user(user_uuid)
+    user_id = request.POST.get('user_id', '').strip()
+    user = get_user(user_id)
     if user is None or user.check_token(token):
         return JsonResponse({
             "message": "Invalid User / Token"}, status=403)
-    return JsonResponse({"user_id": user.uuid, "token": user.b64token})
+    return JsonResponse({"user_id": user.id, "token": user.b64token})
 
 
 def logout(request):
@@ -65,20 +65,21 @@ def browser(request, fingerprint):
 
 
 @token_required
-def user(request, user_uuid):
-    _user = get_user(user_uuid)
+def user(request, user_id):
+    _user = get_user(user_id)
     return JsonResponse({'data': _user.to_dict(with_sensitive_data=True)})
 
 
 @token_required
-def factories(request, factory_uuid=None):
+def factories(request, factory_id=None):
     """
     Get all factories
     """
-    if factory_uuid is not None:
-        factory = get_factory(uuid=factory_uuid)
+    if factory_id is not None:
+        factory = get_factory(id=factory_id)
         return JsonResponse({'data': factory.to_dict()})
-        _factories = []
+
+    _factories = []
 
     for factory in request.user.all_factories():
         _factories.append(factory.to_dict())

@@ -84,12 +84,12 @@ def create_weighment(**kwargs):
     return Weighment.objects.create(**kwargs)
 
 
-def get_user(user_uuid):
+def get_user(user_id):
     """
     docstring for get_factory
     """
     try:
-        return User.objects.get(uuid=user_uuid)
+        return User.objects.get(id=user_id)
     except User.DoesNotExist:
         return None
 
@@ -135,21 +135,21 @@ def create_deduction(**kwargs):
     return Deduction.objects.create(**kwargs)
 
 
-def get_browser(browser_uuid):
+def get_browser(browser_id):
     """
     Get a browser
     """
     try:
-        return Browser.objects.get(uuid=browser_uuid)
+        return Browser.objects.get(id=browser_id)
     except Browser.DoesNotExist:
         return None
 
 
-def create_browser(browser_uuid, data):
+def create_browser(browser_id, data):
     """
     Create a browser
     """
-    return Browser.objects.create(uuid=browser_uuid, data=data)
+    return Browser.objects.create(id=browser_id, data=data)
 
 
 def update_browser(browser, data):

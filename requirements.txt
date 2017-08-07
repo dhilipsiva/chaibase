@@ -8,6 +8,7 @@ django-google-maps==0.7.0
 django-phonenumber-field==1.3.0
 django-tokenapi==1.0
 humanize==0.5.1
+jsonpickle==0.9.5
 maya==0.3.2
 nodeenv==1.1.2
 orm-choices==0.2.2

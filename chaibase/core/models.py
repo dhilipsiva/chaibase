@@ -43,7 +43,7 @@ class BaseModel(Model):
     '''
     objects = BaseManager()
     is_deleted = BooleanField(default=False)
-    uuid = UUIDField(default=uuid4, primary_key=True, editable=False)
+    id = UUIDField(default=uuid4, primary_key=True, editable=False)
 
     class Meta:
         abstract = True
@@ -52,7 +52,7 @@ class BaseModel(Model):
         """
         Serialize
         """
-        return dict(id=str(self.uuid))
+        return dict(id=str(self.id))
 
     def delete(self):
         """
@@ -71,7 +71,7 @@ class BaseModel(Model):
         return self
 
     def __str__(self):
-        return f"{self.uuid}, {self.is_deleted}"
+        return f"{self.id}, {self.is_deleted}"
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: {self.__str__()}>'
@@ -85,7 +85,7 @@ class Browser(BaseModel):
 
     def to_dict(self):
         return {
-            "id": str(self.uuid),
+            "id": str(self.id),
             "data": self.data,
         }
 
@@ -95,7 +95,7 @@ class User(BaseModel, AbstractUser):
     A custom user so that we can add permissions easily
     '''
     objects = BaseUserManager()
-    socket_uuid = UUIDField(
+    socket_id = UUIDField(
         default=uuid4, editable=False, db_index=True, unique=True)
     phone_number = PhoneNumberField(blank=True)
 
@@ -124,7 +124,7 @@ class User(BaseModel, AbstractUser):
 
     @property
     def b64token(self):
-        _bytes = f"{self.uuid}:{self.token}".encode()
+        _bytes = f"{self.id}:{self.token}".encode()
         return b64encode(_bytes).decode()
 
     def check_token(self, token):
@@ -144,7 +144,7 @@ class User(BaseModel, AbstractUser):
         d = dict(username=self.username)
         if with_sensitive_data is True:
             d.update({
-                'socket-uuid': self.socket_uuid,
+                'socket-id': self.socket_id,
                 'phone-number': self.phone_number,
                 'b6token': self.b64token,
                 'factory-count': self.factory_count,
